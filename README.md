@@ -1,3 +1,2 @@
 Sort your array!
-
-If you enter a non-integer number of mass elements, the program will automatically round this number down.
+You can analyse what is going on with the number of exchanges and comparisons using excel!!

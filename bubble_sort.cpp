@@ -1,42 +1,62 @@
-#include <stdio.h>
 #include <iostream>
+#include <fstream>
+#include <ctime>
 
-void bubbleSort(double *num, int size);
+
+int bubbleSort(double *num, int size);
 void give_numbers(double* array, int size);
-double* get_numbers(double* koef, int size);
-double write_number_input(double value);
+double* get_random_numbers(int size, int elem_for_random);
+void write_to_file(int size, int count_of_exchange, int count_of_comparison);
+int count_of_comparison(int size);
+
 
 int main() {
-  double* sortable_array;
-  int size_of_array = 0;
-  std::cout << "Please, enter the size of the array!\n";
-  size_of_array = write_number_input(size_of_array);
-  std::cout << "Please, enter the elements of the array!\n";
-  sortable_array = get_numbers(sortable_array, size_of_array);
-  bubbleSort(sortable_array, size_of_array);  
-  give_numbers(sortable_array, size_of_array);
-  free(sortable_array);
+    srand(time(0));
+    int elem_for_random = 1 + rand() % 1000000;
+    
+    for (int size_of_array = 10; size_of_array <= 1000; size_of_array += 10) {
+        elem_for_random += size_of_array;
+        
+        double* sortable_array = get_random_numbers(size_of_array, elem_for_random);
+        
+        std::cout << "================== " << size_of_array / 10 << " ==================\n\n";
+        std::cout << "==================NOT SORTED!!:\n\n";
+        give_numbers(sortable_array, size_of_array);
+        std::cout << "\n\n";
+        
+        int count_of_exchange = bubbleSort(sortable_array, size_of_array);
+        std::cout << "==================SORTED!!:\n\n";  
+        give_numbers(sortable_array, size_of_array);
+        
+        int count_of_comp = count_of_comparison(size_of_array);
+        write_to_file(size_of_array, count_of_exchange, count_of_comp);
+        delete[] sortable_array;
+        std::cout << "\n\n\n\n";
+    }
 }
 
 
-void bubbleSort(double *num, int size) {
+int bubbleSort(double* num, int size) {
+    int count_of_exchange = 0;
     for (int i = 0; i < size - 1; i++) {
         for (int j = (size - 1); j > i; j--) {
             if (num[j - 1] > num[j]) {
                 double temp = num[j - 1]; 
                 num[j - 1] = num[j];
                 num[j] = temp;
+                count_of_exchange += 1;
             }
         }
     }
+    return count_of_exchange;
 }
 
 
-double* get_numbers(double* koef, int size) {
-	koef = (double*)malloc(size * sizeof(double));
-	int check;
+double* get_random_numbers(int size, int elem_for_random) {
+    srand(elem_for_random);
+	double* koef = new double[size];
 	for (int i = 0; i < size; i++) {
-	    koef[i] = write_number_input(koef[i]);
+	    koef[i] = 1 + rand() % 1000;
 	}
 	return koef;
 }
@@ -48,14 +68,15 @@ void give_numbers(double* array, int size) {
     }
 }
 
-double write_number_input(double value){
-    double check = 0;
-	    while (check == 0) {
-    	    check = scanf("%lf", &value);
-    	    if (check == 0) {
-    	        scanf("%*s");
-    	        printf("Please, enter a number!\n");
-    	    }
-	    }
-    return value;
+
+void write_to_file(int size, int count_of_exchange, int count_of_comparison) {
+    std::ofstream fout;
+    fout.open("file.csv", std::ios::app);
+    fout << size << ";" << count_of_comparison << ";" << count_of_exchange << "\n";
+    fout.close();
+}
+
+
+int count_of_comparison(int size) {
+    return (size * size - size) / 2;
 }
